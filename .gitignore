@@ -1,5 +1,7 @@
-# History files
+# R files
 .Rhistory
-
-# Example code in package build process
 *-Ex.R
+.RData
+
+# emacs temp files
+*~
