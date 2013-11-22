@@ -1,4 +1,4 @@
-NetworkTopologicalProperties
+Degree Distribution
 ============================
 
-CSCI 479 Assignment 4 - Network Topological Properties
+CSCI 479 Assignment 4 - Degree Distribution (Network Topological Properties)
