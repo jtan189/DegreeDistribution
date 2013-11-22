@@ -29,15 +29,11 @@ nodeDeg = adjMatrix %*% matrix(1, numNodes)
 ## calculate number of nodes having each degree
 degDist = t(sapply(0:max(nodeDeg), function(x) c(x, length(which(nodeDeg == x)))))
 
-pdf('plot.pdf')
-
 ## plot degree distribution
 plot(NULL, NULL, xlim = c(min(degDist[, 1]), max(degDist[, 1])),
      ylim = c(min(degDist[, 2]), max(degDist[, 2])),
      xlab = "Degree: k", ylab = "f(k)", main = "Degree Distribution", type = "n")
 points(degDist)
-
-dev.off()
 
 invisible(readline(prompt = "Press [enter] to display on log-log scale."))
 
@@ -48,8 +44,6 @@ degDist = log2(degDist[which(degDist[, 2] > 0), ])
 ## fit degree distribution probabilities according to a linear model
 fit = lm(degDist[, 2]~degDist[, 1])
 
-pdf('plot2.pdf')
-
 ## plot degree distribution probabilities on log-log scale
 plot(NULL, NULL, xlim = c(min(degDist[, 1]), max(degDist[, 1])),
      ylim = c(min(degDist[, 2]), max(degDist[, 2])),
@@ -58,5 +52,3 @@ plot(NULL, NULL, xlim = c(min(degDist[, 1]), max(degDist[, 1])),
      main = "Degree Distribution (log-log scale)", type = "n")
 points(degDist)
 abline(fit)
-
-dev.off()
