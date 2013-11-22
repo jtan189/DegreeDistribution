@@ -8,7 +8,7 @@
 ## 11/21/13
 
 ## input variables
-dataFile = "networkDatasets/karate.txt"
+dataFile = "networkDatasets/HcNetwork.txt"
 
 ## read data
 X = as.matrix(read.table(dataFile))
