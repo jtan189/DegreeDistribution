@@ -5,3 +5,9 @@
 
 # emacs temp files
 *~
+
+# latex
+auto/
+*.aux
+*.log
+report.pdf
