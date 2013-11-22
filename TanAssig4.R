@@ -34,7 +34,7 @@ degDist[, 1] = uniqueDeg
 degDist = t(apply(degDist, 1,
     function(row) c(
         row[1],
-        length(nodeDeg[which(nodeDeg == row[1])]) / numNodes
+        length(nodeDeg[which(nodeDeg == row[1])])
         )
     ))
         
@@ -57,13 +57,44 @@ degDist = t(apply(degDist, 1,
 
 
 
-plot(1, 1, xlim=c(min(degDist[, 1]), max(degDist[, 1])), ylim=c(min(degDist[, 2]), max(degDist[, 2])), type="n")
+#plot(1, 1, xlim=c(min(degDist[, 1]), max(degDist[, 1])), ylim=c(min(degDist[, 2]), max(degDist[, 2])), type="n")
+
+## plot data
+plot(NULL, NULL, xlim = c(min(degDist[ ,1]), max(degDist[ ,1])),
+             ylim = c(min(degDist[ ,2]), max(degDist[ ,2])),
+             xlab = "Degree: k", ylab = "f(k)", main = "Degree Distribution", type = "n")
 points(degDist)
 
 invisible(readline(prompt = "Press [enter] to display on log-log scale."))
-degDist = log(degDist)
-plot(1, 1, xlim=c(min(degDist[, 1]), max(degDist[, 1])), ylim=c(min(degDist[, 2]), max(degDist[, 2])), type="n")
+
+## calculate P(f(K)) and take log2 of both k and P(f(k))
+degDist[ ,2] = degDist[ ,2] / numNodes
+degDist = log2(degDist[which(degDist[,2] > 0), ])
+
+fit = lm(degDist[,2]~degDist[,1])
+gamma = fit$coefficients[2]
+
+cat("Gamma: ", abs(fit$coefficients[2]), "\n")
+summaryFit = summary(fit)
+
+if (summaryFit$coefficients[2,4] < 0.05) {
+    cat("f(k) exhbits scale free behavior\n")
+} else {
+    cat("f(k) does not exhbits scale-free behavior\n")
+}
+
+## plot data
+plot(NULL, NULL, xlim = c(min(degDist[ ,1]), max(degDist[ ,1])),
+             ylim = c(min(degDist[ ,2]), max(degDist[ ,2])),
+             xlab = bquote(paste("Degree: ", log[2], k)), ylab = bquote(paste("Probability: ", log[2], f(k))), main = "Degree Distribution", type = "n")
+
 points(degDist)
+
+abline(line)
+
+
+
+#plot(1, 1, xlim=c(min(degDist[, 1]), max(degDist[, 1])), ylim=c(min(degDist[, 2]), max(degDist[, 2])), type="n")
 
 #plot(1, 1, xlim=c(1, length(uniqueDeg)), ylim=c(0, max(degDist[, 2])), type="n")
 #points(degDist)
