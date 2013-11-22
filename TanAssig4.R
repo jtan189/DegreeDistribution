@@ -1,16 +1,14 @@
-## R program for determining topological properties of a network.
+## Plot degree distribution for an undirected network.
 ##
-## Input requirements:   the name of the file
-##   dataFile: filename of data for which to determine topological properties
+## Input requirements:
+##   dataFile: filename of data for which to plot degree distribution
 ##
 ## Josh Tan
 ## CSCI 479
 ## 11/21/13
 
-## read Lecture 17, Slides 16-19
-
-## INPUT VARIABLES
-dataFile = "networkDatasets/HcNetwork.txt"
+## input variables
+dataFile = "networkDatasets/karate.txt"
 
 ## read data
 X = as.matrix(read.table(dataFile))
@@ -25,80 +23,32 @@ for (i in 1:nrow(X)) {
     adjMatrix[X[i, 2], X[i, 1]] = 1
 }
 
+## calculate degree of each node
 nodeDeg = adjMatrix %*% matrix(1, numNodes)
 
-uniqueDeg = sort(unique(nodeDeg))
-degDist = matrix(0, length(uniqueDeg), 2)
-degDist[, 1] = uniqueDeg
+## calculate number of nodes having each degree
+degDist = t(sapply(0:max(nodeDeg), function(x) c(x, length(which(nodeDeg == x)))))
 
-degDist = t(apply(degDist, 1,
-    function(row) c(
-        row[1],
-        length(nodeDeg[which(nodeDeg == row[1])])
-        )
-    ))
-        
-## index = 1
-## for (i in 1:max(nodeDeg)) {
-##     numWithDeg = length(which(nodeDeg == i))
-##     if (numWithDeg != 0) {
-##         degDist[index, 2] = numWithDeg
-##         index = index + 1
-##     }
-## }
-
-
-#degDist = data.matrix(data.frame(table(nodeDeg)))
-#degDist[ , 2] = degDist[ , 2] / numNodes
-#nodeProb = nodeDeg / numNodes
-
-# maybe useful
-#data.frame(table(nodeDeg))
-
-
-
-#plot(1, 1, xlim=c(min(degDist[, 1]), max(degDist[, 1])), ylim=c(min(degDist[, 2]), max(degDist[, 2])), type="n")
-
-## plot data
-plot(NULL, NULL, xlim = c(min(degDist[ ,1]), max(degDist[ ,1])),
-             ylim = c(min(degDist[ ,2]), max(degDist[ ,2])),
-             xlab = "Degree: k", ylab = "f(k)", main = "Degree Distribution", type = "n")
+## plot degree distribution
+plot(NULL, NULL, xlim = c(min(degDist[, 1]), max(degDist[, 1])),
+     ylim = c(min(degDist[, 2]), max(degDist[, 2])),
+     xlab = "Degree: k", ylab = "f(k)", main = "Degree Distribution", type = "n")
 points(degDist)
 
 invisible(readline(prompt = "Press [enter] to display on log-log scale."))
 
-## calculate P(f(K)) and take log2 of both k and P(f(k))
-degDist[ ,2] = degDist[ ,2] / numNodes
-degDist = log2(degDist[which(degDist[,2] > 0), ])
+## calculate P(f(k)) and take log2 of both k and P(f(k))
+degDist[, 2] = degDist[, 2] / numNodes
+degDist = log2(degDist[which(degDist[, 2] > 0), ])
 
-fit = lm(degDist[,2]~degDist[,1])
-gamma = fit$coefficients[2]
+## fit degree distribution probabilities according to a linear model
+fit = lm(degDist[, 2]~degDist[, 1])
 
-cat("Gamma: ", abs(fit$coefficients[2]), "\n")
-summaryFit = summary(fit)
-
-if (summaryFit$coefficients[2,4] < 0.05) {
-    cat("f(k) exhbits scale free behavior\n")
-} else {
-    cat("f(k) does not exhbits scale-free behavior\n")
-}
-
-## plot data
-plot(NULL, NULL, xlim = c(min(degDist[ ,1]), max(degDist[ ,1])),
-             ylim = c(min(degDist[ ,2]), max(degDist[ ,2])),
-             xlab = bquote(paste("Degree: ", log[2], k)), ylab = bquote(paste("Probability: ", log[2], f(k))), main = "Degree Distribution", type = "n")
-
+## plot degree distribution probabilities on log-log scale
+plot(NULL, NULL, xlim = c(min(degDist[, 1]), max(degDist[, 1])),
+     ylim = c(min(degDist[, 2]), max(degDist[, 2])),
+     xlab = bquote(paste("Degree: ", log[2], k)),
+     ylab = bquote(paste("Probability: ", log[2], f(k))),
+     main = "Degree Distribution (log-log scale)", type = "n")
 points(degDist)
-
-abline(line)
-
-
-
-#plot(1, 1, xlim=c(min(degDist[, 1]), max(degDist[, 1])), ylim=c(min(degDist[, 2]), max(degDist[, 2])), type="n")
-
-#plot(1, 1, xlim=c(1, length(uniqueDeg)), ylim=c(0, max(degDist[, 2])), type="n")
-#points(degDist)
-
-##nodeProb = log(nodeProb)
-##plot(1, 1, xlim=c(0, log(numNodes)), ylim=c(0, log(1)), type="n")
-#plot(log(1:numNodes), log(nodeProb))
+abline(fit)
